@@ -6,6 +6,9 @@
 /.lychee.toml
 /.docs-kit/
 
+# Copy of the built site made by the link check.
+/_linkroot/
+
 # Doc Detective results.
 .github/doc-detective/results/
 

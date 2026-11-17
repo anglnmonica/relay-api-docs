@@ -179,6 +179,7 @@ def github_outputs(config, packs):
         "site_generator": repo.get("site_generator", "none"),
         "build_command": repo.get("build_command", "") or "",
         "build_output": repo.get("build_output", "") or "",
+        "base_path": (repo.get("base_path", "") or "").strip("/"),
         "doc_detective_tests": (checks.get("accuracy") or {}).get("tests_path", ".github/doc-detective/tests/"),
     }
     if values["accuracy"] == "true" and not values["build_output"]:

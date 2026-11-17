@@ -41,6 +41,7 @@ jobs:
       site_generator: ${{ steps.read.outputs.site_generator }}
       build_command: ${{ steps.read.outputs.build_command }}
       build_output: ${{ steps.read.outputs.build_output }}
+      base_path: ${{ steps.read.outputs.base_path }}
       doc_detective_tests: ${{ steps.read.outputs.doc_detective_tests }}
     steps:
       - uses: actions/checkout@v5
@@ -132,14 +133,25 @@ jobs:
         if: needs.config.outputs.build_command != ''
         run: ${{ needs.config.outputs.build_command }}
 
+      # A site published under a folder, such as /my-docs/, has full links
+      # that start with that folder. Copy the built site into a matching
+      # folder, so those links resolve the way they do once published.
+      - name: Match the published folder
+        if: needs.config.outputs.build_output != ''
+        env:
+          BUILD_OUTPUT: ${{ needs.config.outputs.build_output }}
+          BASE_PATH: ${{ needs.config.outputs.base_path }}
+        run: |
+          mkdir -p "_linkroot/$BASE_PATH"
+          cp -r "$BUILD_OUTPUT"/. "_linkroot/$BASE_PATH/"
       - name: Check links on the built site
         if: needs.config.outputs.build_output != ''
         uses: lycheeverse/lychee-action@v2
         with:
           args: >-
             --config .lychee.toml
-            --root-dir "${{ github.workspace }}/${{ needs.config.outputs.build_output }}"
-            "${{ needs.config.outputs.build_output }}/**/*.html"
+            --root-dir "${{ github.workspace }}/_linkroot"
+            "_linkroot/**/*.html"
           fail: true
       - name: Check links in the Markdown files
         if: needs.config.outputs.build_output == ''

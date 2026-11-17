@@ -21,9 +21,10 @@ access point's transmit power, and confirm the fix worked.
 ## Before you begin
 
 - You need a read-write API key. See [Authentication](../authentication.md).
-- Plan a maintenance window. **Changing radio settings restarts the access
-  point's radio.** Devices connected to it disconnect for about 30 seconds,
-  and then reconnect.
+- Plan a maintenance window.
+  **Changing radio settings restarts the access point's radio.**
+  Devices connected to it disconnect for about 30 seconds, and then
+  reconnect.
 - Set the `RELAY_API_KEY` environment variable, as shown in
   [Make your first API call](../quickstart.md).
 
