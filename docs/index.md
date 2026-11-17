@@ -10,9 +10,11 @@ last_reviewed: 2026-11-17
 # Relay API overview
 
 !!! note "Relay is fictional"
-    Relay and its API were created to demonstrate API documentation. The
-    `relay.example` domain doesn't exist, so the example requests on this
-    site don't return real data.
+    Relay and its API were created to demonstrate API documentation.
+    There's no hosted service and there are no usage numbers: this site
+    shows the workflow behind API docs, not business results. The
+    `relay.example` domain doesn't exist, so the example requests don't
+    return real data. To try requests, use the [sandbox](try-it.md).
 
 The Relay API lets you manage a Relay private wireless network from your
 own tools. With it, you can:
