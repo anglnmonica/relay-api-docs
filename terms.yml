@@ -1,0 +1,13 @@
+# Your project's word list.
+#
+# accept: product names and terms that the style check should treat as
+#         correct, such as your product name or feature names.
+# reject: words your team has decided not to use. The style check flags them.
+#
+# Each entry is matched as a regular expression, so "[Dd]ocs-as-code"
+# matches both "Docs-as-code" and "docs-as-code".
+
+accept:
+  - "[Dd]ocs-as-code"
+
+reject: []

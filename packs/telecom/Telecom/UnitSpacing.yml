@@ -1,0 +1,15 @@
+# Telecom.UnitSpacing
+#
+# Puts a space between a number and its unit, as the Google developer
+# documentation style guide and SI conventions require.
+#
+#   Flagged:  3.5GHz, 20MHz, 100Mbps
+#   Correct:  3.5 GHz, 20 MHz, 100 Mbps
+extends: existence
+message: "Put a space between the number and the unit in '%s'."
+level: error
+ignorecase: false
+scope: text
+nonword: true
+tokens:
+  - '\b\d+(?:\.\d+)?(?:GHz|MHz|kHz|Hz|Gbps|Mbps|kbps|dBm|dBi|dB)\b'

@@ -1,0 +1,45 @@
+# Telecom.AcronymFirst
+#
+# House rule: define an acronym the first time you use it, with the
+# acronym first and the spelled-out term in parentheses after it.
+#
+#   Correct:   CBRS (Citizens Broadband Radio Service)
+#   Flagged:   CBRS, with no definition anywhere on the page
+#
+# The "first" pattern finds every acronym on the page. The "second"
+# pattern finds acronym-first definitions and captures the acronym.
+# Vale flags each acronym that has no matching definition.
+extends: conditional
+message: "Define '%s' the first time you use it, with the acronym first, like CBRS (Citizens Broadband Radio Service)."
+level: warning
+ignorecase: false
+scope: text
+first: '\b([A-Z][A-Z0-9]{1,6})s?\b'
+# The spelled-out term can be capitalized, as in CBRS (Citizens Broadband
+# Radio Service), or lowercase, as in SME (subject matter expert).
+second: '\b([A-Z][A-Z0-9]{1,6})s?\s+\((?:[A-Za-z][\w-]*[\s/-]*)+\)'
+# Acronyms that a telecom audience already knows, so they don't need a
+# definition. Add to this list as needed.
+exceptions:
+  - AI
+  - API
+  - AT
+  - CEO
+  - CSS
+  - FAQ
+  - GPS
+  - HTML
+  - ID
+  - IP
+  - IT
+  - LTE
+  - NET
+  - NR
+  - OK
+  - PDF
+  - RAN
+  - RF
+  - UI
+  - URL
+  - US
+  - YAML

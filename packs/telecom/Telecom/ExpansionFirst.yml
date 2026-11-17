@@ -1,0 +1,15 @@
+# Telecom.ExpansionFirst
+#
+# Catches definitions written in the other order, with the spelled-out
+# term first and the acronym in parentheses.
+#
+#   Flagged:   Priority Access License (PAL)
+#   Correct:   PAL (Priority Access License)
+extends: existence
+message: "Put the acronym first. Change '%s' to the form PAL (Priority Access License)."
+level: error
+ignorecase: false
+scope: text
+nonword: true
+tokens:
+  - '(?:\b[A-Z][a-z]+[\s-]+){1,6}\([A-Z][A-Z0-9]{1,6}s?\)'

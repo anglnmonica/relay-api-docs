@@ -1,0 +1,54 @@
+{
+  "description": "Reader journeys through the Relay API docs. Each test follows a path a developer takes and checks that the content is where the docs say it is.",
+  "tests": [
+    {
+      "testId": "overview-to-quickstart",
+      "description": "From the overview, a developer can reach the quickstart and find the first request.",
+      "steps": [
+        { "goTo": "http://localhost:4000/" },
+        { "find": { "selector": "h1", "elementText": "Relay API overview" } },
+        { "find": { "selector": ".admonition-title", "elementText": "Relay is fictional" } },
+        { "click": { "selector": "article a", "elementText": "Make your first API call" } },
+        { "find": { "selector": "h1", "elementText": "Make your first API call" } },
+        { "find": { "selector": "h2", "elementText": "List your sites" } },
+        { "screenshot": { "path": "quickstart.png", "directory": "../results/screenshots", "overwrite": "true" } }
+      ]
+    },
+    {
+      "testId": "reference-has-every-operation",
+      "description": "Each reference page lists its operations, generated from the spec.",
+      "steps": [
+        { "goTo": "http://localhost:4000/reference/sites/" },
+        { "find": { "selector": "h2", "elementText": "List sites" } },
+        { "find": { "selector": "h2", "elementText": "Create a site" } },
+        { "find": { "selector": "h2", "elementText": "Get a site" } },
+        { "goTo": "http://localhost:4000/reference/devices/" },
+        { "find": { "selector": "h2", "elementText": "List devices" } },
+        { "find": { "selector": "h2", "elementText": "Get a device" } },
+        { "find": { "selector": "h2", "elementText": "Update a device" } },
+        { "screenshot": { "path": "devices-reference.png", "directory": "../results/screenshots", "overwrite": "true" } },
+        { "goTo": "http://localhost:4000/reference/alerts/" },
+        { "find": { "selector": "h2", "elementText": "List alerts" } },
+        { "find": { "selector": "h2", "elementText": "Acknowledge an alert" } }
+      ]
+    },
+    {
+      "testId": "guide-links-to-reference",
+      "description": "The interference guide warns about the radio restart and links to the Update a device reference.",
+      "steps": [
+        { "goTo": "http://localhost:4000/guides/reduce-interference/" },
+        { "find": { "selector": "h1", "elementText": "Reduce interference between access points" } },
+        { "find": { "selector": "strong", "elementText": "Changing radio settings restarts the access point's radio." } },
+        { "click": { "selector": "article a", "elementText": "Devices reference: Update a device" } },
+        { "find": { "selector": "h2", "elementText": "Update a device" } }
+      ]
+    },
+    {
+      "testId": "spec-downloads",
+      "description": "The OpenAPI spec linked from the docs downloads.",
+      "steps": [
+        { "checkLink": "http://localhost:4000/openapi.yaml" }
+      ]
+    }
+  ]
+}

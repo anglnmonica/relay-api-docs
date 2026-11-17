@@ -1,0 +1,4 @@
+# Python packages for building the docs site. Install with:
+#   pip install -r requirements.txt
+mkdocs-material==9.6.14
+pyyaml==6.0.2

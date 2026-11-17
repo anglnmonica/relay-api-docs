@@ -1,0 +1,123 @@
+# docs-kit.yml
+#
+# The one file you edit to set up the docs kit for your project.
+# The automated checks and the AI skills both read this file, so the kit
+# adapts to your product instead of anyone else's.
+#
+# How to use it:
+#   1. Copy this file to the root of your docs repository.
+#   2. Replace every value marked "<...>". Keep the defaults you agree with.
+#   3. Turn domain packs on or off under "packs".
+#
+# Lines that start with "#" are comments. They explain each setting and
+# are ignored by the kit.
+
+# ---------------------------------------------------------------------------
+# Your product and readers
+# The AI skills use this section to decide tone, depth, and examples.
+# ---------------------------------------------------------------------------
+project:
+  product_name: "Relay"                    # Exact customer-facing name and casing.
+  description: "Relay lets network teams manage the sites, devices, and alerts on a private wireless network. Relay is fictional, created to demonstrate API documentation."
+  docs_url: "https://anglnmonica.github.io/relay-api-docs/"   # Where the published docs live.
+  audience:
+    primary: "developers who automate network operations"   # Who reads the docs most.
+    technical_level: intermediate          # beginner | intermediate | expert
+    also_reads: [network administrators, AI coding assistants]   # Optional, such as [installers, sales engineers].
+
+# ---------------------------------------------------------------------------
+# Your docs repository
+# The checks use this section to find your files and build your site.
+# ---------------------------------------------------------------------------
+repository:
+  content_path: docs/                      # Folder that holds your docs.
+  format: markdown                         # markdown | mdx | asciidoc
+  site_generator: mkdocs                   # jekyll | docusaurus | mkdocs | hugo | none
+  build_command: "mkdocs build --strict"   # Such as "bundle exec jekyll build". Leave empty if none.
+  build_output: site                       # Folder the build creates, such as _site/ or build/.
+  default_branch: main
+
+# ---------------------------------------------------------------------------
+# Writing style
+# ---------------------------------------------------------------------------
+style:
+  base: google                             # google | microsoft. The style guide the rules follow.
+  voice:
+    person: second                         # second ("you") | first ("I", "we"). Product docs use second.
+    contractions: true                     # Allow "don't", "it's".
+  # Your own word list: product names and terms the spelling and style
+  # checks should accept, and words they should flag. See terms.yml.
+  terminology_file: terms.yml
+
+# ---------------------------------------------------------------------------
+# Domain packs
+# Extra rules for a field. Turn on the packs that match your product.
+# Each pack adds style rules, terms, and tests that prove its rules work.
+# ---------------------------------------------------------------------------
+packs:
+  telecom: true    # Acronym-first definitions, such as "CBRS (Citizens Broadband
+                   # Radio Service)", plus telecom terms, units, and unit spacing.
+  # More packs can be added here later.
+
+# ---------------------------------------------------------------------------
+# Automated checks
+# These run on every pull request. Each one can be turned off.
+# ---------------------------------------------------------------------------
+checks:
+  style:
+    enabled: true
+    tool: vale
+    fail_on: error                         # error | warning. Lower levels are posted as suggestions only.
+  spelling:
+    enabled: true
+    tool: codespell
+    ignore_words: []                       # Words that are spelled correctly but get flagged, such as [ue].
+  links:
+    enabled: true
+    tool: lychee
+    weekly: true                           # Also check links every Monday, since outside pages can break.
+    exclude: []                            # Sites that block link checkers, such as ["linkedin\\.com"].
+  accuracy:
+    enabled: true                          # Needs a built site. Turn on after setting build_command.
+    tool: doc-detective
+    tests_path: .github/doc-detective/tests/
+  rule_tests:
+    enabled: true                          # Proves each custom style rule still catches what it should.
+
+# ---------------------------------------------------------------------------
+# Document types
+# Templates the kit provides. The AI skills use the matching template when
+# you ask for a new document. Turn off the ones your team doesn't write.
+# ---------------------------------------------------------------------------
+doc_types:
+  installation_guide: false
+  configuration_guide: false
+  how_to: true
+  troubleshooting: true
+  release_notes: true
+  api_reference: true                      # Turn on if you have an API. Needs sources.api_spec.
+  white_paper: false
+  solution_brief: false
+  templates_path: templates/
+
+# ---------------------------------------------------------------------------
+# Sources of truth
+# Where the AI skills check facts. A claim counts as verified only if it's
+# found in one of these. Anything else is marked for a person to confirm.
+# ---------------------------------------------------------------------------
+sources:
+  api_spec: api/openapi.yaml               # Path or URL to an OpenAPI file, if you have one.
+  ui_strings: ""                           # Where exact button and menu labels are defined.
+  product_specs: []                        # Specs, tickets, or release plans, as paths or URLs.
+  subject_matter_experts: []               # Roles to ask, such as ["RF engineering lead"]. No personal details.
+
+# ---------------------------------------------------------------------------
+# AI skills
+# Rules every AI skill follows, whatever it's writing or reviewing.
+# ---------------------------------------------------------------------------
+ai:
+  never_invent: true                       # Never make up facts, settings, values, or links.
+  unverified_marker: "[unverified]"        # Added after any claim the AI couldn't confirm.
+  review_checklist: checklists/review.md   # What the review skill checks a draft against.
+  verify_rules: checklists/verify.md       # How both skills check facts.
+  deliver_as: pull_request                 # pull_request | files

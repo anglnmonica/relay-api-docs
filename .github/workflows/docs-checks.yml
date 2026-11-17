@@ -1,0 +1,221 @@
+# Documentation checks, set up from docs-kit.yml.
+#
+# The first job reads docs-kit.yml. Each check after it runs only if it's
+# turned on there:
+#   - Style:      Vale, with Google or Microsoft style and any domain packs
+#   - Rule tests: proves each domain pack's rules catch known mistakes
+#   - Spelling:   codespell
+#   - Links:      Lychee, on the built site or on the Markdown files
+#   - Accuracy:   Doc Detective walks through the built site like a reader
+#
+# To change what runs, edit docs-kit.yml, not this file.
+
+name: Docs checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 15 * * 1" # Mondays at 15:00 UTC, for the weekly link check
+  workflow_dispatch: # Adds a "Run workflow" button on the Actions tab
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  config:
+    name: Read docs-kit.yml
+    runs-on: ubuntu-latest
+    outputs:
+      style: ${{ steps.read.outputs.style }}
+      spelling: ${{ steps.read.outputs.spelling }}
+      links: ${{ steps.read.outputs.links }}
+      links_weekly: ${{ steps.read.outputs.links_weekly }}
+      accuracy: ${{ steps.read.outputs.accuracy }}
+      rule_tests: ${{ steps.read.outputs.rule_tests }}
+      fail_on: ${{ steps.read.outputs.fail_on }}
+      content_path: ${{ steps.read.outputs.content_path }}
+      site_generator: ${{ steps.read.outputs.site_generator }}
+      build_command: ${{ steps.read.outputs.build_command }}
+      build_output: ${{ steps.read.outputs.build_output }}
+      doc_detective_tests: ${{ steps.read.outputs.doc_detective_tests }}
+    steps:
+      - uses: actions/checkout@v5
+      - run: pip install pyyaml
+      - id: read
+        run: python3 scripts/configure.py --github-output
+
+  style:
+    name: Style (Vale)
+    needs: config
+    if: needs.config.outputs.style == 'true' && github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: pip install pyyaml && python3 scripts/configure.py
+      # Step 1: Post warnings and suggestions on the lines you changed.
+      # These don't fail the check.
+      - name: Report style suggestions
+        uses: errata-ai/vale-action@v2
+        with:
+          files: ${{ needs.config.outputs.content_path }}
+          # GitHub's Checks feature takes any number of comments. Plain
+          # annotations stop at 10 and turn into a failure past that.
+          reporter: github-pr-check
+          fail_on_error: false
+      # Step 2: Fail if any page, changed or not, has a problem at the level
+      # set by checks.style.fail_on.
+      - name: Fail on style problems
+        uses: errata-ai/vale-action@v2
+        with:
+          files: ${{ needs.config.outputs.content_path }}
+          vale_flags: "--minAlertLevel=${{ needs.config.outputs.fail_on }}"
+          filter_mode: nofilter
+          fail_on_error: true
+
+  rule-tests:
+    name: Rule tests (domain packs)
+    needs: config
+    if: needs.config.outputs.rule_tests == 'true' && github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install Vale
+        run: |
+          curl -sSL https://github.com/errata-ai/vale/releases/download/v3.9.1/vale_3.9.1_Linux_64-bit.tar.gz \
+            | sudo tar xz -C /usr/local/bin vale
+      - run: pip install pyyaml
+      - name: Test each domain pack's rules
+        run: bash scripts/test-packs.sh
+
+  spelling:
+    name: Spelling (codespell)
+    needs: config
+    if: needs.config.outputs.spelling == 'true' && github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: pip install pyyaml codespell && python3 scripts/configure.py
+      - name: Check spelling
+        run: codespell "${{ needs.config.outputs.content_path }}"
+
+  links:
+    name: Links (Lychee)
+    needs: config
+    if: >
+      needs.config.outputs.links == 'true' &&
+      (github.event_name != 'schedule' || needs.config.outputs.links_weekly == 'true')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: pip install pyyaml && python3 scripts/configure.py
+
+      # Build the site, if docs-kit.yml has a build command, so links are
+      # checked as readers see them.
+      - if: needs.config.outputs.site_generator == 'jekyll'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+      - if: needs.config.outputs.site_generator == 'docusaurus'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - if: needs.config.outputs.site_generator == 'docusaurus'
+        run: npm ci
+      - if: needs.config.outputs.site_generator == 'mkdocs'
+        run: pip install -r requirements.txt
+      - name: Build the site
+        if: needs.config.outputs.build_command != ''
+        run: ${{ needs.config.outputs.build_command }}
+
+      - name: Check links on the built site
+        if: needs.config.outputs.build_output != ''
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --config .lychee.toml
+            --root-dir "${{ github.workspace }}/${{ needs.config.outputs.build_output }}"
+            "${{ needs.config.outputs.build_output }}/**/*.html"
+          fail: true
+      - name: Check links in the Markdown files
+        if: needs.config.outputs.build_output == ''
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --config .lychee.toml "${{ needs.config.outputs.content_path }}"
+          fail: true
+          # A small set of Markdown docs can have no links yet. A built site
+          # always has links, so the step above keeps the default.
+          failIfEmpty: false
+
+  accuracy:
+    name: Accuracy (Doc Detective)
+    needs: config
+    if: needs.config.outputs.accuracy == 'true' && github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - if: needs.config.outputs.site_generator == 'jekyll'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - if: needs.config.outputs.site_generator == 'docusaurus'
+        run: npm ci
+      - if: needs.config.outputs.site_generator == 'mkdocs'
+        run: pip install -r requirements.txt
+      - name: Build the site
+        run: ${{ needs.config.outputs.build_command }}
+      - name: Serve the site at http://localhost:4000
+        run: |
+          python3 -m http.server 4000 --directory "${{ needs.config.outputs.build_output }}" > /dev/null 2>&1 &
+          sleep 2
+      - name: Walk through the site with Doc Detective
+        # Test paths are relative to the current folder, so they're passed
+        # here instead of in the config file.
+        run: >
+          npx --yes doc-detective@4
+          --config .github/doc-detective/config.json
+          --input "${{ needs.config.outputs.doc_detective_tests }}"
+          --output .github/doc-detective/results
+          -r terminal -r junit -r runFolder
+      - name: Confirm the tests ran
+        # Fails if no tests ran or any test was skipped, so a missing browser
+        # can't quietly turn into a green check mark.
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import glob, sys
+          import xml.etree.ElementTree as ET
+          files = glob.glob(".github/doc-detective/results/**/junit.xml", recursive=True) + glob.glob("junit.xml")
+          if not files:
+              print("::error::Doc Detective produced no results file.")
+              sys.exit(1)
+          root = ET.parse(files[0]).getroot()
+          suites = [root] if root.tag == "testsuite" else root.findall("testsuite")
+          cases = [c for s in suites for c in s.iter("testcase")]
+          failed = [c.get("name") for c in cases if c.find("failure") is not None or c.find("error") is not None]
+          skipped = [c.get("name") for c in cases if c.find("skipped") is not None]
+          passed = len(cases) - len(failed) - len(skipped)
+          print(f"::notice title=Doc Detective::{passed} passed, {len(failed)} failed, {len(skipped)} skipped, of {len(cases)} tests")
+          for name in failed:
+              print(f"::error title=Doc Detective test failed::{name}")
+          for name in skipped:
+              print(f"::error title=Doc Detective test skipped::{name}")
+          sys.exit(1 if (failed or skipped or passed == 0) else 0)
+          PY
+      - name: Save screenshots and results
+        # Download from the run's Summary page, under Artifacts.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc-detective-results
+          path: .github/doc-detective/results/
+          include-hidden-files: true
+          if-no-files-found: warn

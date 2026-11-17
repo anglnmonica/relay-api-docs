@@ -1,0 +1,837 @@
+openapi: 3.1.0
+info:
+  title: Relay API
+  version: 1.0.0
+  summary: Manage the sites, devices, and alerts on a Relay private network.
+  description: |
+    Relay is a fictional private network platform, created to demonstrate
+    API documentation. The Relay API lets you list and create sites, read
+    and change device settings, and review and acknowledge alerts.
+
+    Requests and responses use JSON. Every request needs an API key.
+  contact:
+    name: Angelin Monica Selvaraj
+    url: https://anglnmonica.github.io
+  license:
+    name: MIT
+    identifier: MIT
+
+servers:
+  - url: https://api.relay.example/v1
+    description: Relay API, version 1. The relay.example domain is fictional.
+
+security:
+  - apiKey: []
+
+tags:
+  - name: Sites
+    description: A site is one physical location on your network, such as a warehouse or campus. Every device belongs to one site.
+  - name: Devices
+    description: Devices are the access points and gateways installed at your sites.
+  - name: Alerts
+    description: Alerts report problems on your network, such as a device going offline.
+
+paths:
+  /sites:
+    get:
+      operationId: listSites
+      tags: [Sites]
+      summary: List sites
+      description: Returns your sites, sorted by creation time, oldest first. Results are paginated.
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: A page of sites.
+          headers:
+            RateLimit-Limit:
+              $ref: "#/components/headers/RateLimit-Limit"
+            RateLimit-Remaining:
+              $ref: "#/components/headers/RateLimit-Remaining"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteList"
+              example:
+                data:
+                  - id: site_7Kq2nP
+                    name: Oakland distribution center
+                    time_zone: America/Los_Angeles
+                    device_count: 24
+                    created_at: "2026-09-14T17:02:11Z"
+                next_cursor: null
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+    post:
+      operationId: createSite
+      tags: [Sites]
+      summary: Create a site
+      description: |
+        Creates a site. After you create a site, you can add devices to it
+        in the Relay console.
+
+        Requires a read-write API key.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SiteCreate"
+            example:
+              name: Fremont assembly plant
+              time_zone: America/Los_Angeles
+      responses:
+        "201":
+          description: The site was created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Site"
+              example:
+                id: site_3Rt9wX
+                name: Fremont assembly plant
+                time_zone: America/Los_Angeles
+                device_count: 0
+                created_at: "2026-11-17T18:30:00Z"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: A site with this name already exists. Site names must be unique.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error:
+                  code: conflict
+                  message: A site named "Fremont assembly plant" already exists.
+                  request_id: req_8hX2kL
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /sites/{site_id}:
+    get:
+      operationId: getSite
+      tags: [Sites]
+      summary: Get a site
+      description: Returns one site.
+      parameters:
+        - $ref: "#/components/parameters/SiteId"
+      responses:
+        "200":
+          description: The site.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Site"
+              example:
+                id: site_7Kq2nP
+                name: Oakland distribution center
+                time_zone: America/Los_Angeles
+                device_count: 24
+                created_at: "2026-09-14T17:02:11Z"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /devices:
+    get:
+      operationId: listDevices
+      tags: [Devices]
+      summary: List devices
+      description: Returns your devices, sorted by name. Use the query parameters to filter by site, type, or status. Results are paginated.
+      parameters:
+        - name: site_id
+          in: query
+          description: Return only devices at this site.
+          schema:
+            type: string
+            examples: [site_7Kq2nP]
+        - name: type
+          in: query
+          description: Return only devices of this type.
+          schema:
+            $ref: "#/components/schemas/DeviceType"
+        - name: status
+          in: query
+          description: Return only devices with this status.
+          schema:
+            $ref: "#/components/schemas/DeviceStatus"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: A page of devices.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceList"
+              example:
+                data:
+                  - id: dev_A1b2C3
+                    site_id: site_7Kq2nP
+                    name: Dock door 4
+                    type: access_point
+                    model: RL-AP200
+                    serial_number: RLA2006Q4K19
+                    status: online
+                    firmware_version: 4.2.1
+                    radio:
+                      band: n48
+                      channel_bandwidth_mhz: 20
+                      transmit_power_dbm: 23
+                    last_seen_at: "2026-11-17T18:29:41Z"
+                next_cursor: Y3Vyc29yOmRldl9BMWIyQzM
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /devices/{device_id}:
+    get:
+      operationId: getDevice
+      tags: [Devices]
+      summary: Get a device
+      description: Returns one device, including its radio settings if it's an access point.
+      parameters:
+        - $ref: "#/components/parameters/DeviceId"
+      responses:
+        "200":
+          description: The device.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Device"
+              example:
+                id: dev_A1b2C3
+                site_id: site_7Kq2nP
+                name: Dock door 4
+                type: access_point
+                model: RL-AP200
+                serial_number: RLA2006Q4K19
+                status: online
+                firmware_version: 4.2.1
+                radio:
+                  band: n48
+                  channel_bandwidth_mhz: 20
+                  transmit_power_dbm: 23
+                last_seen_at: "2026-11-17T18:29:41Z"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+    patch:
+      operationId: updateDevice
+      tags: [Devices]
+      summary: Update a device
+      description: |
+        Changes a device's name or radio settings. Send only the fields you
+        want to change.
+
+        **Changing radio settings restarts the access point's radio.** Devices
+        connected to that access point disconnect for about 30 seconds and
+        then reconnect. Schedule radio changes for a maintenance window.
+
+        Radio settings apply only to access points. Sending `radio` for a
+        gateway returns a `400` error.
+
+        Requires a read-write API key.
+      parameters:
+        - $ref: "#/components/parameters/DeviceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeviceUpdate"
+            example:
+              radio:
+                transmit_power_dbm: 20
+      responses:
+        "200":
+          description: The device, with the changes applied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Device"
+              example:
+                id: dev_A1b2C3
+                site_id: site_7Kq2nP
+                name: Dock door 4
+                type: access_point
+                model: RL-AP200
+                serial_number: RLA2006Q4K19
+                status: online
+                firmware_version: 4.2.1
+                radio:
+                  band: n48
+                  channel_bandwidth_mhz: 20
+                  transmit_power_dbm: 20
+                last_seen_at: "2026-11-17T18:31:02Z"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /alerts:
+    get:
+      operationId: listAlerts
+      tags: [Alerts]
+      summary: List alerts
+      description: Returns your alerts, newest first. Use the query parameters to filter by site, severity, or status. Results are paginated.
+      parameters:
+        - name: site_id
+          in: query
+          description: Return only alerts at this site.
+          schema:
+            type: string
+            examples: [site_7Kq2nP]
+        - name: severity
+          in: query
+          description: Return only alerts with this severity.
+          schema:
+            $ref: "#/components/schemas/AlertSeverity"
+        - name: status
+          in: query
+          description: Return only alerts with this status.
+          schema:
+            $ref: "#/components/schemas/AlertStatus"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: A page of alerts.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AlertList"
+              example:
+                data:
+                  - id: alt_Q7m4Zs
+                    site_id: site_7Kq2nP
+                    device_id: dev_D4e5F6
+                    severity: critical
+                    type: device_offline
+                    message: Access point "Mezzanine east" hasn't responded for 10 minutes.
+                    status: open
+                    created_at: "2026-11-17T17:55:00Z"
+                    acknowledged_at: null
+                    acknowledged_note: null
+                next_cursor: null
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /alerts/{alert_id}/acknowledge:
+    post:
+      operationId: acknowledgeAlert
+      tags: [Alerts]
+      summary: Acknowledge an alert
+      description: |
+        Marks an open alert as acknowledged, to show that someone is working
+        on it. Acknowledging doesn't fix the problem. The alert resolves on
+        its own when the problem clears.
+
+        Acknowledging an alert that's already acknowledged returns the alert
+        unchanged. Acknowledging a resolved alert returns a `409` error.
+
+        Requires a read-write API key.
+      parameters:
+        - name: alert_id
+          in: path
+          required: true
+          description: The ID of the alert, which starts with `alt_`.
+          schema:
+            type: string
+            examples: [alt_Q7m4Zs]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlertAcknowledge"
+            example:
+              note: Technician dispatched to the mezzanine.
+      responses:
+        "200":
+          description: The alert, now acknowledged.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alert"
+              example:
+                id: alt_Q7m4Zs
+                site_id: site_7Kq2nP
+                device_id: dev_D4e5F6
+                severity: critical
+                type: device_offline
+                message: Access point "Mezzanine east" hasn't responded for 10 minutes.
+                status: acknowledged
+                created_at: "2026-11-17T17:55:00Z"
+                acknowledged_at: "2026-11-17T18:04:12Z"
+                acknowledged_note: Technician dispatched to the mezzanine.
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: The alert is resolved, so it can't be acknowledged.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                error:
+                  code: conflict
+                  message: Alert alt_Q7m4Zs is resolved and can't be acknowledged.
+                  request_id: req_2Wp9sD
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+components:
+  securitySchemes:
+    apiKey:
+      type: http
+      scheme: bearer
+      description: |
+        Send your API key in the `Authorization` header:
+        `Authorization: Bearer <your API key>`.
+
+        Create keys in the Relay console, under **Settings** > **API keys**.
+        A read-only key can call any `GET` operation. A read-write key can
+        call every operation.
+
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      description: The maximum number of results to return.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Cursor:
+      name: cursor
+      in: query
+      description: The `next_cursor` value from the previous page. Leave it out to get the first page.
+      schema:
+        type: string
+        examples: [Y3Vyc29yOmRldl9BMWIyQzM]
+    SiteId:
+      name: site_id
+      in: path
+      required: true
+      description: The ID of the site, which starts with `site_`.
+      schema:
+        type: string
+        examples: [site_7Kq2nP]
+    DeviceId:
+      name: device_id
+      in: path
+      required: true
+      description: The ID of the device, which starts with `dev_`.
+      schema:
+        type: string
+        examples: [dev_A1b2C3]
+
+  headers:
+    RateLimit-Limit:
+      description: The number of requests your API key can make each minute.
+      schema:
+        type: integer
+        examples: [100]
+    RateLimit-Remaining:
+      description: The number of requests your API key has left in the current minute.
+      schema:
+        type: integer
+        examples: [97]
+    Retry-After:
+      description: The number of seconds to wait before you send another request.
+      schema:
+        type: integer
+        examples: [12]
+
+  responses:
+    InvalidRequest:
+      description: A parameter or field is missing, has the wrong type, or is out of range. The message names the problem.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: invalid_request
+              message: "limit must be between 1 and 100. Received: 500."
+              request_id: req_5Gh7jK
+    Unauthorized:
+      description: The API key is missing, malformed, or revoked.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: unauthorized
+              message: The API key is missing or invalid.
+              request_id: req_1Ab3Cd
+    Forbidden:
+      description: The API key is read-only, and this operation changes data.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: forbidden
+              message: This operation requires a read-write API key.
+              request_id: req_9Xy8Zw
+    NotFound:
+      description: No resource with this ID exists in your account.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: not_found
+              message: No device with ID dev_Z9y8X7 exists.
+              request_id: req_4Lm6Np
+    RateLimited:
+      description: Your API key sent more than 100 requests in one minute. Wait the number of seconds in the `Retry-After` header, then try again.
+      headers:
+        Retry-After:
+          $ref: "#/components/headers/Retry-After"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error:
+              code: rate_limited
+              message: Too many requests. Try again in 12 seconds.
+              request_id: req_7Qr2St
+
+  schemas:
+    Site:
+      type: object
+      description: A physical location on your network.
+      required: [id, name, time_zone, device_count, created_at]
+      properties:
+        id:
+          type: string
+          description: The site's unique ID, which starts with `site_`.
+          examples: [site_7Kq2nP]
+        name:
+          type: string
+          description: The site's name. Unique in your account.
+          maxLength: 80
+          examples: [Oakland distribution center]
+        time_zone:
+          type: string
+          description: The site's time zone, as a name from the IANA (Internet Assigned Numbers Authority) time zone database. Relay uses it to schedule maintenance windows.
+          examples: [America/Los_Angeles]
+        device_count:
+          type: integer
+          description: The number of devices at the site.
+          minimum: 0
+          examples: [24]
+        created_at:
+          type: string
+          format: date-time
+          description: When the site was created, in UTC.
+          examples: ["2026-09-14T17:02:11Z"]
+
+    SiteCreate:
+      type: object
+      description: The fields for a new site.
+      required: [name, time_zone]
+      properties:
+        name:
+          type: string
+          description: The site's name. Must be unique in your account. Maximum 80 characters.
+          minLength: 1
+          maxLength: 80
+          examples: [Fremont assembly plant]
+        time_zone:
+          type: string
+          description: The site's time zone, as a name from the IANA (Internet Assigned Numbers Authority) time zone database, such as `America/Chicago`.
+          examples: [America/Los_Angeles]
+
+    SiteList:
+      type: object
+      description: One page of sites.
+      required: [data, next_cursor]
+      properties:
+        data:
+          type: array
+          description: The sites on this page.
+          items:
+            $ref: "#/components/schemas/Site"
+        next_cursor:
+          $ref: "#/components/schemas/NextCursor"
+
+    DeviceType:
+      type: string
+      description: |
+        The kind of device:
+        - `access_point`: a radio that connects user devices to the network.
+        - `gateway`: connects a site to the Relay cloud.
+      enum: [access_point, gateway]
+
+    DeviceStatus:
+      type: string
+      description: |
+        The device's connection to Relay:
+        - `online`: connected and reporting.
+        - `offline`: hasn't reported for 10 minutes or more.
+        - `provisioning`: added, but not yet connected for the first time.
+      enum: [online, offline, provisioning]
+
+    Radio:
+      type: object
+      description: An access point's radio settings. Changing them restarts the radio, which disconnects connected devices for about 30 seconds.
+      properties:
+        band:
+          type: string
+          description: The frequency band the radio uses, as a 3GPP band name. Set by the device model.
+          readOnly: true
+          examples: [n48]
+        channel_bandwidth_mhz:
+          type: integer
+          description: The channel bandwidth, in MHz. Wider channels carry more data, but need more free spectrum.
+          enum: [10, 20, 40]
+          default: 20
+        transmit_power_dbm:
+          type: integer
+          description: The transmit power, in dBm. Lower power shrinks the coverage area and reduces interference with nearby access points.
+          minimum: 0
+          maximum: 30
+          default: 23
+
+    Device:
+      type: object
+      description: An access point or gateway installed at a site.
+      required: [id, site_id, name, type, model, serial_number, status, firmware_version, last_seen_at]
+      properties:
+        id:
+          type: string
+          description: The device's unique ID, which starts with `dev_`.
+          examples: [dev_A1b2C3]
+        site_id:
+          type: string
+          description: The ID of the site where the device is installed.
+          examples: [site_7Kq2nP]
+        name:
+          type: string
+          description: The device's name, such as its location in the building.
+          maxLength: 60
+          examples: [Dock door 4]
+        type:
+          $ref: "#/components/schemas/DeviceType"
+        model:
+          type: string
+          description: The device's model number.
+          examples: [RL-AP200]
+        serial_number:
+          type: string
+          description: The serial number printed on the device's label.
+          examples: [RLA2006Q4K19]
+        status:
+          $ref: "#/components/schemas/DeviceStatus"
+        firmware_version:
+          type: string
+          description: The firmware version the device is running.
+          examples: [4.2.1]
+        radio:
+          $ref: "#/components/schemas/Radio"
+        last_seen_at:
+          type: ["string", "null"]
+          format: date-time
+          description: When the device last reported to Relay, in UTC. `null` if it hasn't connected yet.
+          examples: ["2026-11-17T18:29:41Z"]
+
+    DeviceUpdate:
+      type: object
+      description: The device fields you can change. Send only the fields you want to change.
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          description: A new name for the device. Maximum 60 characters.
+          minLength: 1
+          maxLength: 60
+          examples: [Dock door 4]
+        radio:
+          type: object
+          description: New radio settings. Access points only. Changing them restarts the radio.
+          minProperties: 1
+          properties:
+            channel_bandwidth_mhz:
+              type: integer
+              description: The channel bandwidth, in MHz.
+              enum: [10, 20, 40]
+            transmit_power_dbm:
+              type: integer
+              description: The transmit power, in dBm.
+              minimum: 0
+              maximum: 30
+
+    DeviceList:
+      type: object
+      description: One page of devices.
+      required: [data, next_cursor]
+      properties:
+        data:
+          type: array
+          description: The devices on this page.
+          items:
+            $ref: "#/components/schemas/Device"
+        next_cursor:
+          $ref: "#/components/schemas/NextCursor"
+
+    AlertSeverity:
+      type: string
+      description: |
+        How urgent the alert is:
+        - `critical`: service is down for users. Act now.
+        - `major`: service is degraded.
+        - `minor`: a problem that doesn't affect service yet.
+        - `info`: for your records. No action needed.
+      enum: [critical, major, minor, info]
+
+    AlertStatus:
+      type: string
+      description: |
+        Where the alert is in its lifecycle:
+        - `open`: the problem is active, and no one has acknowledged it.
+        - `acknowledged`: someone is working on it.
+        - `resolved`: the problem cleared. Relay resolves alerts automatically.
+      enum: [open, acknowledged, resolved]
+
+    Alert:
+      type: object
+      description: A problem detected on your network.
+      required: [id, site_id, device_id, severity, type, message, status, created_at, acknowledged_at, acknowledged_note]
+      properties:
+        id:
+          type: string
+          description: The alert's unique ID, which starts with `alt_`.
+          examples: [alt_Q7m4Zs]
+        site_id:
+          type: string
+          description: The ID of the site where the problem is.
+          examples: [site_7Kq2nP]
+        device_id:
+          type: ["string", "null"]
+          description: The ID of the device with the problem. `null` for alerts about a whole site.
+          examples: [dev_D4e5F6]
+        severity:
+          $ref: "#/components/schemas/AlertSeverity"
+        type:
+          type: string
+          description: |
+            What the alert is about:
+            - `device_offline`: a device stopped reporting.
+            - `high_cpu`: a device's processor stayed over 90% for 5 minutes.
+            - `radio_interference`: an access point detected interference on its channel.
+            - `certificate_expiring`: a device certificate expires within 30 days.
+          enum: [device_offline, high_cpu, radio_interference, certificate_expiring]
+        message:
+          type: string
+          description: A readable description of the problem.
+          examples: [Access point "Mezzanine east" hasn't responded for 10 minutes.]
+        status:
+          $ref: "#/components/schemas/AlertStatus"
+        created_at:
+          type: string
+          format: date-time
+          description: When Relay detected the problem, in UTC.
+          examples: ["2026-11-17T17:55:00Z"]
+        acknowledged_at:
+          type: ["string", "null"]
+          format: date-time
+          description: When someone acknowledged the alert, in UTC. `null` if no one has.
+          examples: ["2026-11-17T18:04:12Z"]
+        acknowledged_note:
+          type: ["string", "null"]
+          description: The note added when the alert was acknowledged. `null` if there's none.
+          examples: [Technician dispatched to the mezzanine.]
+
+    AlertAcknowledge:
+      type: object
+      description: Optional details for acknowledging an alert.
+      properties:
+        note:
+          type: string
+          description: A note for your team, such as who's handling the alert. Maximum 280 characters.
+          maxLength: 280
+          examples: [Technician dispatched to the mezzanine.]
+
+    AlertList:
+      type: object
+      description: One page of alerts.
+      required: [data, next_cursor]
+      properties:
+        data:
+          type: array
+          description: The alerts on this page.
+          items:
+            $ref: "#/components/schemas/Alert"
+        next_cursor:
+          $ref: "#/components/schemas/NextCursor"
+
+    NextCursor:
+      type: ["string", "null"]
+      description: Pass this value as `cursor` to get the next page. `null` on the last page.
+      examples: [Y3Vyc29yOmRldl9BMWIyQzM]
+
+    Error:
+      type: object
+      description: The body of every error response.
+      required: [error]
+      properties:
+        error:
+          type: object
+          description: Details about the error.
+          required: [code, message, request_id]
+          properties:
+            code:
+              type: string
+              description: A code your program can check. Doesn't change between releases.
+              enum: [invalid_request, unauthorized, forbidden, not_found, conflict, rate_limited, internal_error]
+            message:
+              type: string
+              description: A readable description of the error. Can change, so don't parse it.
+              examples: [The API key is missing or invalid.]
+            request_id:
+              type: string
+              description: The request's ID. Include it when you contact support.
+              examples: [req_1Ab3Cd]

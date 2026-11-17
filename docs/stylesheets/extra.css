@@ -1,0 +1,17 @@
+/* Brand color, matching anglnmonica.github.io. */
+:root {
+  --md-primary-fg-color: #0f6e73;
+  --md-primary-fg-color--light: #2c8a8f;
+  --md-primary-fg-color--dark: #0a5054;
+  --md-accent-fg-color: #0f6e73;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-accent-fg-color: #5cc0c4;
+  --md-typeset-a-color: #5cc0c4;
+}
+
+/* Keep field and parameter names on one line in reference tables. */
+.md-typeset table:not([class]) td:first-child code {
+  white-space: nowrap;
+}

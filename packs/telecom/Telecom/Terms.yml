@@ -1,0 +1,30 @@
+# Telecom.Terms
+#
+# Enforces the standard spelling and capitalization of common wireless
+# and networking terms. Each line below maps a wrong form (left) to the
+# correct form (right). Matching is case-sensitive, so the correct form
+# itself is never flagged.
+#
+# To add a term, add a line in the form:  wrong|other-wrong: Correct
+extends: substitution
+message: "Use '%s' instead of '%s'."
+level: error
+ignorecase: false
+scope: text
+swap:
+  # Wi-Fi: capital W, capital F, with a hyphen
+  '\b(?:WiFi|Wifi|wifi|WIFI|Wi-fi|wi-fi|wi-Fi|WI-FI)\b': Wi-Fi
+  # Generations: always a capital G
+  '\b5g\b': 5G
+  '\b4g\b': 4G
+  # 5G New Radio: "5G NR" with a space
+  '\b(?:5GNR|5G-NR|5g NR|5G nr)\b': 5G NR
+  # Open RAN Alliance specifications
+  '\b(?:ORAN|Oran|O-Ran|o-ran|O-ran)\b': O-RAN
+  # Base stations: lowercase e/g, capital N and B, no hyphen
+  '\b(?:ENodeB|e-NodeB|eNodeb|enodeb|Enodeb|ENODEB)\b': eNodeB
+  '\b(?:GNodeB|g-NodeB|gNodeb|gnodeb|Gnodeb|GNODEB)\b': gNodeB
+  # Citizens Broadband Radio Service
+  '\b(?:Cbrs|cbrs)\b': CBRS
+  # Internet of Things
+  '\b(?:IOT|Iot|iot)\b': IoT

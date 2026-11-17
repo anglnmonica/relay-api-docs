@@ -1,0 +1,65 @@
+# MkDocs settings for the Relay API docs. https://www.mkdocs.org
+site_name: Relay API docs
+site_description: Documentation for the Relay API, a fictional private network management API created to demonstrate API documentation.
+site_url: https://anglnmonica.github.io/relay-api-docs/
+site_author: Angelin Monica Selvaraj
+copyright: >-
+  Relay is fictional, created by
+  <a href="https://anglnmonica.github.io">Angelin Monica Selvaraj</a>
+  to demonstrate API documentation.
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - content.code.copy
+    - search.highlight
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+
+nav:
+  - Overview: index.md
+  - Get started:
+      - Make your first API call: quickstart.md
+      - Authentication: authentication.md
+  - Guides:
+      - Reduce interference between access points: guides/reduce-interference.md
+      - Pagination and rate limits: pagination-and-rate-limits.md
+      - Errors: errors.md
+  - Reference:
+      - Sites: reference/sites.md
+      - Devices: reference/devices.md
+      - Alerts: reference/alerts.md
+      - OpenAPI spec: openapi.md
+  - Release notes: release-notes.md

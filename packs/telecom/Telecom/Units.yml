@@ -1,0 +1,18 @@
+# Telecom.Units
+#
+# Enforces the correct capitalization of frequency, data-rate, and power
+# units, following SI conventions: GHz, MHz, kHz, Mbps, Gbps, kbps, dBm.
+# Matching is case-sensitive, so the correct form is never flagged.
+extends: substitution
+message: "Use '%s' instead of '%s'."
+level: error
+ignorecase: false
+scope: text
+swap:
+  '\b(?:Ghz|GHZ|ghz)\b': GHz
+  '\b(?:Mhz|MHZ|mhz)\b': MHz
+  '\b(?:KHz|Khz|khz|KHZ)\b': kHz
+  '\b(?:mbps|MBPS|Mbs|mbs)\b': Mbps
+  '\b(?:gbps|GBPS|Gbs)\b': Gbps
+  '\b(?:Kbps|KBPS|kbs)\b': kbps
+  '\b(?:dbm|DBM|Dbm|dBM)\b': dBm

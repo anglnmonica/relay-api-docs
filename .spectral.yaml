@@ -1,0 +1,67 @@
+# Spectral rules for the Relay API spec, api/openapi.yaml.
+# Spectral checks that the spec is valid OpenAPI and follows these rules.
+# https://docs.stoplight.io/docs/spectral
+#
+# The custom rules come from writing docs that AI tools can use: an agent
+# calling an API has only the spec to go on, so every field needs a
+# description, and every response needs an example.
+
+extends: ["spectral:oas"]
+
+rules:
+  # Built-in rules, raised from warnings to errors.
+  operation-description: error
+  operation-operationId: error
+  operation-tags: error
+  oas3-valid-media-example: error
+  oas3-valid-schema-example: error
+
+  # The spec lists one fictional server, so a real contact email isn't needed.
+  info-contact: off
+
+  relay-property-description:
+    description: Every schema property needs a description.
+    message: "This property needs a description."
+    severity: error
+    given: "$.components.schemas..properties[*]"
+    then:
+      function: truthy
+      field: description
+
+  relay-schema-description:
+    description: Every schema needs a description.
+    message: "This schema needs a description."
+    severity: error
+    given: "$.components.schemas[*]"
+    then:
+      field: description
+      function: truthy
+
+  relay-parameter-description:
+    description: Every parameter needs a description.
+    message: "Parameter needs a description."
+    severity: error
+    given:
+      - "$.paths[*][*].parameters[*]"
+      - "$.components.parameters[*]"
+    then:
+      field: description
+      function: truthy
+
+  relay-response-example:
+    description: Every JSON response needs an example, so readers and AI tools see a real response.
+    message: "This response needs an example."
+    severity: error
+    given: "$.paths[*][*].responses[?(@.content)].content.application/json"
+    then:
+      field: example
+      function: truthy
+
+  relay-request-example:
+    description: Every JSON request body needs an example.
+    message: "This request body needs an example."
+    severity: error
+    given: "$.paths[*][*].requestBody.content.application/json"
+    then:
+      field: example
+      function: truthy
