@@ -19,6 +19,7 @@ workflow needs, such as which checks are turned on.
 Requires PyYAML:  pip install pyyaml
 """
 
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -145,7 +146,15 @@ def write_codespell(config):
 
 def write_lychee(config):
     links = config["checks"].get("links") or {}
-    exclude = links.get("exclude") or []
+    exclude = list(links.get("exclude") or [])
+    # When the built site is checked, every page is checked as a file, so
+    # full links to the site's own address don't need an online check.
+    # Skipping them also avoids false failures for pages that aren't
+    # published yet, such as new pages in a pull request.
+    docs_url = (config.get("project") or {}).get("docs_url", "")
+    build_output = (config.get("repository") or {}).get("build_output", "")
+    if build_output and docs_url.startswith("http") and "<" not in docs_url:
+        exclude.append("^" + re.escape(docs_url.rstrip("/")).replace("\\", "\\\\"))
     quoted = ",\n".join(f'  "{pattern}"' for pattern in exclude)
     lines = [
         "# Generated from docs-kit.yml by scripts/configure.py. Don't edit by hand.",
