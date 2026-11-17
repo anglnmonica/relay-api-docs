@@ -14,6 +14,9 @@ the example requests don't return data.
 | `api/openapi.yaml` | The OpenAPI 3.1 specification: 8 operations for sites, devices, and alerts. The source of truth for the reference. |
 | `api/generate_reference.py` | Generates the reference pages in `docs/reference/` from the spec. |
 | `docs/` | The docs site: an overview, a quickstart, authentication, a task guide, pagination and rate limits, errors, release notes, and the generated reference. |
+| `docs/try-it.md` | The Try it page, where visitors send requests to an in-browser sandbox. |
+| `docs/javascripts/sandbox.js` | The sandbox: a fake Relay server that runs in the browser and follows the spec's rules. |
+| `api/sandbox-contract-test.mjs` | Sends 37 requests to the sandbox and checks each response against the spec. |
 | `.spectral.yaml` | Rules for the spec: every operation, parameter, and field needs a description, and every request and response needs an example. |
 | `mkdocs.yml` | Site settings, for [MkDocs Material](https://squidfunk.github.io/mkdocs-material/). |
 
@@ -32,7 +35,8 @@ the AI skills in `.claude/skills/`.
 | Links (Lychee) | Broken links on the built site |
 | Accuracy (Doc Detective) | A page that no longer has what the docs say it does, such as a missing operation |
 | Spec lint (Spectral) | Invalid OpenAPI, and any operation, parameter, or field without a description or example |
-| Reference drift | Reference pages that don't match the spec |
+| Reference drift | Reference pages, or the Try it page's operation list, that don't match the spec |
+| Sandbox contract | A sandbox response that doesn't match the spec |
 
 ## Change the API
 

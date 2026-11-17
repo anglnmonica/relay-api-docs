@@ -53,6 +53,7 @@ nav:
   - Get started:
       - Make your first API call: quickstart.md
       - Authentication: authentication.md
+      - Try the API: try-it.md
   - Guides:
       - Reduce interference between access points: guides/reduce-interference.md
       - Pagination and rate limits: pagination-and-rate-limits.md

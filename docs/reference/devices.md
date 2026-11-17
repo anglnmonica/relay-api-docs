@@ -32,6 +32,8 @@ An access point or gateway installed at a site.
 
 Returns your devices, sorted by name. Use the query parameters to filter by site, type, or status. Results are paginated.
 
+[Try it in the sandbox](../try-it.md#listDevices)
+
 ### Query parameters
 
 | Name | Type | Required | Description |
@@ -91,6 +93,8 @@ Status: `200`
 `GET /devices/{device_id}`
 
 Returns one device, including its radio settings if it's an access point.
+
+[Try it in the sandbox](../try-it.md#getDevice)
 
 ### Path parameters
 
@@ -152,6 +156,8 @@ Radio settings apply only to access points. Sending `radio` for a
 gateway returns a `400` error.
 
 Requires a read-write API key.
+
+[Try it in the sandbox](../try-it.md#updateDevice)
 
 ### Path parameters
 

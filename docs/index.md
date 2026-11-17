@@ -50,7 +50,9 @@ whether a request worked.
    in about five minutes.
 2. [Authentication](authentication.md): create an API key with the right
    access, and keep it secure.
-3. [Reduce interference between access points](guides/reduce-interference.md):
+3. [Try the API](try-it.md): send requests to a sandbox in your browser,
+   with sample data.
+4. [Reduce interference between access points](guides/reduce-interference.md):
    a complete task, from finding an alert to changing radio settings.
 
 ## For AI tools

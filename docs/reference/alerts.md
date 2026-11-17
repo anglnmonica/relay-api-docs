@@ -29,6 +29,8 @@ A problem detected on your network.
 
 Returns your alerts, newest first. Use the query parameters to filter by site, severity, or status. Results are paginated.
 
+[Try it in the sandbox](../try-it.md#listAlerts)
+
 ### Query parameters
 
 | Name | Type | Required | Description |
@@ -91,6 +93,8 @@ Acknowledging an alert that's already acknowledged returns the alert
 unchanged. Acknowledging a resolved alert returns a `409` error.
 
 Requires a read-write API key.
+
+[Try it in the sandbox](../try-it.md#acknowledgeAlert)
 
 ### Path parameters
 

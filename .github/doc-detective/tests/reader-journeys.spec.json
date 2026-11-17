@@ -155,6 +155,38 @@
           "checkLink": "http://localhost:4000/openapi.yaml"
         }
       ]
+    },
+    {
+      "testId": "try-it-sends-a-request",
+      "description": "On the Try it page, a developer can send the example Update a device request and see a successful response.",
+      "steps": [
+        {
+          "goTo": "http://localhost:4000/try-it/#updateDevice"
+        },
+        {
+          "find": {
+            "selector": "#tryit-operation"
+          }
+        },
+        {
+          "click": {
+            "selector": "form.tryit-form button[type=submit]"
+          }
+        },
+        {
+          "find": {
+            "selector": ".tryit-status",
+            "elementText": "200 Success: PATCH /devices/dev_A1b2C3"
+          }
+        },
+        {
+          "screenshot": {
+            "path": "try-it.png",
+            "directory": "../results/screenshots",
+            "overwrite": "true"
+          }
+        }
+      ]
     }
   ]
 }

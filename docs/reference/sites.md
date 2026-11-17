@@ -24,6 +24,8 @@ A physical location on your network.
 
 Returns your sites, sorted by creation time, oldest first. Results are paginated.
 
+[Try it in the sandbox](../try-it.md#listSites)
+
 ### Query parameters
 
 | Name | Type | Required | Description |
@@ -74,6 +76,8 @@ Creates a site. After you create a site, you can add devices to it
 in the Relay console.
 
 Requires a read-write API key.
+
+[Try it in the sandbox](../try-it.md#createSite)
 
 ### Request body
 
@@ -126,6 +130,8 @@ Status: `201`
 `GET /sites/{site_id}`
 
 Returns one site.
+
+[Try it in the sandbox](../try-it.md#getSite)
 
 ### Path parameters
 

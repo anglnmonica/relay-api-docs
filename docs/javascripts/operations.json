@@ -1,0 +1,266 @@
+[
+  {
+    "operationId": "listSites",
+    "tag": "Sites",
+    "summary": "List sites",
+    "method": "GET",
+    "path": "/sites",
+    "params": [
+      {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "description": "The maximum number of results to return.",
+        "example": null,
+        "enum": null,
+        "default": 20
+      },
+      {
+        "name": "cursor",
+        "in": "query",
+        "required": false,
+        "description": "The `next_cursor` value from the previous page. Leave it out to get the first page.",
+        "example": "Y3Vyc29yOmRldl9BMWIyQzM",
+        "enum": null,
+        "default": null
+      }
+    ],
+    "body": null,
+    "writes": false,
+    "reference": "../reference/sites/#list-sites"
+  },
+  {
+    "operationId": "createSite",
+    "tag": "Sites",
+    "summary": "Create a site",
+    "method": "POST",
+    "path": "/sites",
+    "params": [],
+    "body": {
+      "name": "Fremont assembly plant",
+      "time_zone": "America/Los_Angeles"
+    },
+    "writes": true,
+    "reference": "../reference/sites/#create-a-site"
+  },
+  {
+    "operationId": "getSite",
+    "tag": "Sites",
+    "summary": "Get a site",
+    "method": "GET",
+    "path": "/sites/{site_id}",
+    "params": [
+      {
+        "name": "site_id",
+        "in": "path",
+        "required": true,
+        "description": "The ID of the site, which starts with `site_`.",
+        "example": "site_7Kq2nP",
+        "enum": null,
+        "default": null
+      }
+    ],
+    "body": null,
+    "writes": false,
+    "reference": "../reference/sites/#get-a-site"
+  },
+  {
+    "operationId": "listDevices",
+    "tag": "Devices",
+    "summary": "List devices",
+    "method": "GET",
+    "path": "/devices",
+    "params": [
+      {
+        "name": "site_id",
+        "in": "query",
+        "required": false,
+        "description": "Return only devices at this site.",
+        "example": "site_7Kq2nP",
+        "enum": null,
+        "default": null
+      },
+      {
+        "name": "type",
+        "in": "query",
+        "required": false,
+        "description": "Return only devices of this type.",
+        "example": null,
+        "enum": [
+          "access_point",
+          "gateway"
+        ],
+        "default": null
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "required": false,
+        "description": "Return only devices with this status.",
+        "example": null,
+        "enum": [
+          "online",
+          "offline",
+          "provisioning"
+        ],
+        "default": null
+      },
+      {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "description": "The maximum number of results to return.",
+        "example": null,
+        "enum": null,
+        "default": 20
+      },
+      {
+        "name": "cursor",
+        "in": "query",
+        "required": false,
+        "description": "The `next_cursor` value from the previous page. Leave it out to get the first page.",
+        "example": "Y3Vyc29yOmRldl9BMWIyQzM",
+        "enum": null,
+        "default": null
+      }
+    ],
+    "body": null,
+    "writes": false,
+    "reference": "../reference/devices/#list-devices"
+  },
+  {
+    "operationId": "getDevice",
+    "tag": "Devices",
+    "summary": "Get a device",
+    "method": "GET",
+    "path": "/devices/{device_id}",
+    "params": [
+      {
+        "name": "device_id",
+        "in": "path",
+        "required": true,
+        "description": "The ID of the device, which starts with `dev_`.",
+        "example": "dev_A1b2C3",
+        "enum": null,
+        "default": null
+      }
+    ],
+    "body": null,
+    "writes": false,
+    "reference": "../reference/devices/#get-a-device"
+  },
+  {
+    "operationId": "updateDevice",
+    "tag": "Devices",
+    "summary": "Update a device",
+    "method": "PATCH",
+    "path": "/devices/{device_id}",
+    "params": [
+      {
+        "name": "device_id",
+        "in": "path",
+        "required": true,
+        "description": "The ID of the device, which starts with `dev_`.",
+        "example": "dev_A1b2C3",
+        "enum": null,
+        "default": null
+      }
+    ],
+    "body": {
+      "radio": {
+        "transmit_power_dbm": 20
+      }
+    },
+    "writes": true,
+    "reference": "../reference/devices/#update-a-device"
+  },
+  {
+    "operationId": "listAlerts",
+    "tag": "Alerts",
+    "summary": "List alerts",
+    "method": "GET",
+    "path": "/alerts",
+    "params": [
+      {
+        "name": "site_id",
+        "in": "query",
+        "required": false,
+        "description": "Return only alerts at this site.",
+        "example": "site_7Kq2nP",
+        "enum": null,
+        "default": null
+      },
+      {
+        "name": "severity",
+        "in": "query",
+        "required": false,
+        "description": "Return only alerts with this severity.",
+        "example": null,
+        "enum": [
+          "critical",
+          "major",
+          "minor",
+          "info"
+        ],
+        "default": null
+      },
+      {
+        "name": "status",
+        "in": "query",
+        "required": false,
+        "description": "Return only alerts with this status.",
+        "example": null,
+        "enum": [
+          "open",
+          "acknowledged",
+          "resolved"
+        ],
+        "default": null
+      },
+      {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "description": "The maximum number of results to return.",
+        "example": null,
+        "enum": null,
+        "default": 20
+      },
+      {
+        "name": "cursor",
+        "in": "query",
+        "required": false,
+        "description": "The `next_cursor` value from the previous page. Leave it out to get the first page.",
+        "example": "Y3Vyc29yOmRldl9BMWIyQzM",
+        "enum": null,
+        "default": null
+      }
+    ],
+    "body": null,
+    "writes": false,
+    "reference": "../reference/alerts/#list-alerts"
+  },
+  {
+    "operationId": "acknowledgeAlert",
+    "tag": "Alerts",
+    "summary": "Acknowledge an alert",
+    "method": "POST",
+    "path": "/alerts/{alert_id}/acknowledge",
+    "params": [
+      {
+        "name": "alert_id",
+        "in": "path",
+        "required": true,
+        "description": "The ID of the alert, which starts with `alt_`.",
+        "example": "alt_Q7m4Zs",
+        "enum": null,
+        "default": null
+      }
+    ],
+    "body": {
+      "note": "Technician dispatched to the mezzanine."
+    },
+    "writes": true,
+    "reference": "../reference/alerts/#acknowledge-an-alert"
+  }
+]

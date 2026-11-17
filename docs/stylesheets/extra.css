@@ -15,3 +15,85 @@
 .md-typeset table:not([class]) td:first-child code {
   white-space: nowrap;
 }
+
+/* Try it page. Colors use Material's variables, so dark mode works. */
+.tryit-form {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem 1.2rem 1.2rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.2rem;
+}
+
+.tryit-field {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+/* Let long option text shrink to the screen, instead of widening the form. */
+.tryit-form > *,
+.tryit-field select {
+  min-width: 0;
+  width: 100%;
+}
+
+.tryit-field label,
+.tryit-label {
+  font-weight: 600;
+  margin: 0;
+}
+
+.tryit-field select,
+.tryit-field input,
+.tryit-field textarea {
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--md-default-fg-color--lighter);
+  border-radius: 0.2rem;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+  max-width: 100%;
+}
+
+.tryit-field textarea {
+  font-family: var(--md-code-font-family);
+}
+
+.tryit-field select:focus-visible,
+.tryit-field input:focus-visible,
+.tryit-field textarea:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 1px;
+}
+
+.tryit-hint {
+  margin: 0;
+  font-size: 0.7rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.tryit-reference {
+  font-size: 0.7rem;
+}
+
+.md-typeset .tryit-curl,
+.md-typeset .tryit-response {
+  margin: 0;
+}
+
+.tryit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.md-typeset .tryit-actions .md-button {
+  margin: 0;
+  cursor: pointer;
+}
+
+.tryit-status {
+  font-weight: 600;
+}

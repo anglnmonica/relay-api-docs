@@ -4,6 +4,8 @@
 #     request and response has an example. Rules are in .spectral.yaml.
 #   - Reference drift: the reference pages are generated from the spec. This
 #     check fails if someone changed one without the other.
+#   - Sandbox contract: sends requests to the Try it sandbox and checks each
+#     response against the spec, so the sandbox can't drift from the docs.
 
 name: API checks
 
@@ -36,3 +38,16 @@ jobs:
       - run: pip install pyyaml
       - name: Check that the reference pages match the spec
         run: python3 api/generate_reference.py --check
+
+  sandbox-contract:
+    name: Sandbox matches the spec
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install the test's packages
+        run: npm install --no-save --prefix api ajv@8 ajv-formats@3 yaml@2
+      - name: Check every sandbox response against the spec
+        run: node api/sandbox-contract-test.mjs

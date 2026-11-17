@@ -147,7 +147,8 @@ def curl(method, path, params, body):
 
 def operation_section(path, method, op):
     params = [resolve(p) for p in op.get("parameters", [])]
-    out = [f"## {op['summary']}", "", f"`{method.upper()} {path}`", "", op["description"].strip(), ""]
+    out = [f"## {op['summary']}", "", f"`{method.upper()} {path}`", "", op["description"].strip(), "",
+           f"[Try it in the sandbox](../try-it.md#{op['operationId']})", ""]
 
     path_params = [p for p in params if p["in"] == "path"]
     query_params = [p for p in params if p["in"] == "query"]
@@ -203,6 +204,33 @@ def page_for_tag(tag):
     return "\n".join(out).rstrip() + "\n"
 
 
+def try_it_operations():
+    """The fields the Try it page needs for each operation, in spec order."""
+    ops = []
+    for path, item in spec["paths"].items():
+        for method in METHODS:
+            op = item.get(method)
+            if not op:
+                continue
+            params = []
+            for p in (resolve(x) for x in op.get("parameters", [])):
+                schema = resolve(p["schema"])
+                params.append({
+                    "name": p["name"], "in": p["in"], "required": bool(p.get("required")),
+                    "description": p.get("description", ""),
+                    "example": (schema.get("examples") or [None])[0],
+                    "enum": schema.get("enum"), "default": schema.get("default"),
+                })
+            body = op.get("requestBody", {}).get("content", {}).get("application/json", {}).get("example")
+            ops.append({
+                "operationId": op["operationId"], "tag": op["tags"][0], "summary": op["summary"],
+                "method": method.upper(), "path": path, "params": params, "body": body,
+                "writes": method != "get",
+                "reference": f"../reference/{op['tags'][0].lower()}/#{op['summary'].lower().replace(' ', '-')}",
+            })
+    return ops
+
+
 def main():
     check = "--check" in sys.argv
     stale = []
@@ -216,6 +244,17 @@ def main():
         else:
             page.write_text(text)
             print(f"Wrote {page}")
+    # Operation data for the Try it page.
+    ops_file = Path("docs/javascripts/operations.json")
+    ops_text = json.dumps(try_it_operations(), indent=2) + "\n"
+    if check:
+        if not ops_file.exists() or ops_file.read_text() != ops_text:
+            stale.append(ops_file.as_posix())
+    else:
+        ops_file.parent.mkdir(parents=True, exist_ok=True)
+        ops_file.write_text(ops_text)
+        print(f"Wrote {ops_file}")
+
     # Publish a copy of the spec with the site, for download.
     spec_copy = Path("docs/openapi.yaml")
     if check:
