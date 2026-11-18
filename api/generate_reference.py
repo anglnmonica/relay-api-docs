@@ -199,6 +199,7 @@ def front_matter(tag, title):
         "title": title,
         "description": f"{tag['description']} This reference lists the "
                        f"{tag['name'].lower()} endpoints, their parameters, and their responses.",
+        "status": "published",
         "last_reviewed": str(spec["info"]["x-last-reviewed"]),
         "questions": questions,
     }

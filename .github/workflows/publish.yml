@@ -1,4 +1,5 @@
-# Publishes the docs site to GitHub Pages on every push to main.
+# Publishes the docs site to GitHub Pages on every push to main, and every
+# Monday, so the docs health report shows reviews as they come due.
 # One-time setup: in the repository's Settings > Pages, set Source to
 # "GitHub Actions".
 
@@ -7,6 +8,8 @@ name: Publish site
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: "0 15 * * 1" # Mondays at 15:00 UTC
   workflow_dispatch:
 
 permissions:
@@ -29,6 +32,12 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Build the site
         run: mkdocs build --strict
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      # Publishes the report at /relay-api-docs/docs-health/.
+      - name: Build the docs health report
+        run: node scripts/health/report.mjs --title "Relay API docs health" --out site/docs-health docs/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site

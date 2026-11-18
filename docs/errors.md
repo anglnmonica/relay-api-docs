@@ -4,6 +4,7 @@ description: The format of Relay API errors, what each error code means, and whi
 doc_type: api_reference
 audience: developers who automate network operations
 api_version: v1
+status: published
 last_reviewed: 2026-11-17
 questions:
   - What does a Relay API error look like?

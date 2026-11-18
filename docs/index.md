@@ -4,6 +4,7 @@ description: The Relay API lets you manage the sites, devices, and alerts on a R
 doc_type: api_reference
 audience: developers who automate network operations
 api_version: v1
+status: published
 last_reviewed: 2026-11-17
 questions:
   - What can I do with the Relay API?
@@ -73,3 +74,6 @@ These docs also publish:
   summary of each.
 - A Markdown copy of each page. Add `index.md` to the page's address, such
   as `quickstart/index.md`.
+- A [docs health report](docs-health/), rebuilt on every change and every
+  Monday: each page's status, when it was last reviewed, and how many
+  AI-readiness checks it passes.
