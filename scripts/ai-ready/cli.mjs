@@ -77,6 +77,11 @@ if (unknown.length) console.error(`Unknown rule IDs in skip: ${unknown.join(", "
 const results = [];
 for (const file of opts.paths.flatMap(markdownFiles)) {
   const text = fs.readFileSync(file, "utf8");
+  // An empty file isn't a page yet, such as a placeholder for a page to come.
+  if (!text.trim()) {
+    if (!opts.json) console.log(`\n${file}: skipped, because the file is empty.`);
+    continue;
+  }
   const { findings, checked } = checkPage(text, pageOptions);
   const retrieval = opts.retrieval
     ? pageQuestions(text).map((q) => ({ question: q, sections: retrieve(text, q).map(({ title, path, line, score }) => ({ title: path ? `${path} > ${title}` : title, line, score })) }))
