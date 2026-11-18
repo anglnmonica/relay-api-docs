@@ -5,6 +5,9 @@ doc_type: api_reference
 audience: developers who automate network operations
 api_version: v1
 last_reviewed: 2026-11-17
+questions:
+  - What does a Relay API error look like?
+  - Which Relay API errors are safe to retry?
 ---
 
 # Errors

@@ -1,3 +1,12 @@
+---
+title: Alerts reference
+description: Alerts report problems on your network, such as a device going offline. This reference lists the alerts endpoints, their parameters, and their responses.
+last_reviewed: '2026-11-17'
+questions:
+- How do I list alerts with the Relay API?
+- How do I acknowledge an alert with the Relay API?
+---
+
 <!-- Generated from api/openapi.yaml by api/generate_reference.py. Don't edit this page by hand. -->
 
 # Alerts reference

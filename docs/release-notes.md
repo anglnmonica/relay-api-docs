@@ -6,6 +6,9 @@ audience: developers who automate network operations
 product_version: v1
 release_date: 2026-11-17
 last_reviewed: 2026-11-17
+questions:
+  - What changed in Relay API version 1.0.0?
+  - What are the known issues in the Relay API?
 ---
 
 # Relay API release notes

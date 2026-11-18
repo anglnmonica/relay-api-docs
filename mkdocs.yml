@@ -10,6 +10,7 @@ copyright: >-
 
 theme:
   name: material
+  custom_dir: overrides
   features:
     - navigation.sections
     - navigation.top
@@ -31,6 +32,9 @@ theme:
       toggle:
         icon: material/weather-sunny
         name: Switch to light mode
+
+hooks:
+  - hooks/markdown_copies.py
 
 extra_css:
   - stylesheets/extra.css

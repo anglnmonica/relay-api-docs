@@ -5,6 +5,10 @@ doc_type: how_to
 audience: developers who automate network operations
 product_version: v1
 last_reviewed: 2026-11-17
+questions:
+  - How do I find radio interference alerts?
+  - How do I lower an access point's transmit power?
+  - How do I confirm that interference is fixed?
 ---
 
 # Reduce interference between access points
@@ -97,9 +101,9 @@ The response shows the alert with `status` set to `acknowledged`.
     The valid range is 0 to 30 dBm. A value outside the range returns a
     `400` error, and the setting doesn't change.
 
-## Confirm the fix
+## Confirm that the interference is fixed
 
-Relay resolves the alert on its own when the interference clears.
+Relay resolves an interference alert on its own when the interference clears.
 
 1. List the alert's site again, filtered to resolved alerts:
 

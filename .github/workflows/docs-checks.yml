@@ -7,6 +7,8 @@
 #   - Spelling:   codespell
 #   - Links:      Lychee, on the built site or on the Markdown files
 #   - Accuracy:   Doc Detective walks through the built site like a reader
+#   - AI readiness: the docs-as-code kit's page and site checks, from
+#                 scripts/ai-ready. See the kit's docs/ai-readiness.md.
 #
 # To change what runs, edit docs-kit.yml, not this file.
 
@@ -48,6 +50,29 @@ jobs:
       - run: pip install pyyaml
       - id: read
         run: python3 scripts/configure.py --github-output
+
+  ai-ready:
+    name: AI readiness
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      # The site checks need the built site: llms.txt, the sitemap,
+      # robots.txt, structured data, and the Markdown copies.
+      - name: Build the site
+        run: mkdocs build --strict
+      - name: Check pages and the site
+        run: >-
+          node scripts/ai-ready/cli.mjs --fail-on warning
+          --site site --base-url https://anglnmonica.github.io/relay-api-docs/
+          docs/
 
   style:
     name: Style (Vale)

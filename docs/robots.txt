@@ -1,0 +1,5 @@
+# All crawlers, including AI crawlers, may read these docs.
+User-agent: *
+Allow: /
+
+Sitemap: https://anglnmonica.github.io/relay-api-docs/sitemap.xml

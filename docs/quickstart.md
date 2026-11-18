@@ -5,6 +5,9 @@ doc_type: how_to
 audience: developers who automate network operations
 product_version: v1
 last_reviewed: 2026-11-17
+questions:
+  - How do I make my first Relay API call?
+  - How do I list the devices at a site?
 ---
 
 # Make your first API call

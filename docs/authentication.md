@@ -5,6 +5,11 @@ doc_type: how_to
 audience: developers who automate network operations
 product_version: v1
 last_reviewed: 2026-11-17
+questions:
+  - How do I create a Relay API key?
+  - How do I send my API key with a request?
+  - How do I revoke a Relay API key?
+  - Should I use a read-only or read-write key?
 ---
 
 # Authentication
@@ -24,7 +29,8 @@ read-only key leaks, nothing on your network can be changed with it.
 
 ## Create an API key
 
-Before you begin, you need the Administrator role in the Relay console.
+You create Relay API keys in the Relay console. You need the Administrator
+role.
 
 1. In the Relay console, go to **Settings** > **API keys**.
 2. Click **Create key**.
@@ -58,7 +64,7 @@ curl https://api.relay.example/v1/sites \
   breaking the others.
 - Use read-only keys wherever you can.
 
-## Revoke a key
+## Revoke an API key
 
 If a key is exposed, such as in a public repository, revoke it right away.
 
