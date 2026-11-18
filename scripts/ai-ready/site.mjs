@@ -63,8 +63,11 @@ function htmlTitle(file) {
 }
 
 // Map a URL in llms.txt to a file in the built site, or null.
-function resolve(siteDir, url, baseUrl) {
+function resolve(siteDir, url, baseUrl, external = []) {
   let p = url;
+  // Another site under the same address, such as a GitHub Pages project
+  // site at example.github.io/other-project/.
+  if (external.some((prefix) => p.startsWith(prefix))) return { external: true };
   if (baseUrl && p.startsWith(baseUrl)) p = p.slice(baseUrl.length);
   else if (/^https?:\/\//.test(p)) return { external: true };
   p = decodeURI(p.split("#")[0].split("?")[0]).replace(/^\/+/, "");
@@ -83,7 +86,8 @@ const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
  * @param {string} siteDir - the build output folder.
  * @param {string} baseUrl - the site's address, such as https://example.com/docs/
  */
-export function checkSite(siteDir, baseUrl = "") {
+export function checkSite(siteDir, baseUrl = "", options = {}) {
+  const external = options.external || [];
   const findings = [];
   const add = (id, file, message) =>
     findings.push({ rule: id, severity: RULE[id].severity, file, message, fix: RULE[id].fix });
@@ -101,7 +105,7 @@ export function checkSite(siteDir, baseUrl = "") {
     const text = fs.readFileSync(llms, "utf8");
     for (const m of text.matchAll(/\[([^\]]+)\]\(([^)\s]+)\)/g)) {
       const [, label, url] = m;
-      const r = resolve(siteDir, url, baseUrl);
+      const r = resolve(siteDir, url, baseUrl, external);
       if (r.external) continue;
       if (!r.file) {
         add("llms-txt", "llms.txt", `The link "${label}" goes to ${url}, which isn't in the built site.`);
@@ -124,7 +128,7 @@ export function checkSite(siteDir, baseUrl = "") {
     const xml = fs.readFileSync(sitemap, "utf8");
     const listed = new Set();
     for (const m of xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/g)) {
-      const r = resolve(siteDir, m[1], baseUrl);
+      const r = resolve(siteDir, m[1], baseUrl, external);
       if (r.file) listed.add(path.resolve(r.file));
     }
     const missing = pages.filter((p) => !listed.has(path.resolve(p)) && !/noindex/i.test(fs.readFileSync(p, "utf8").slice(0, 4000)));

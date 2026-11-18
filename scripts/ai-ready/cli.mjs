@@ -4,7 +4,8 @@
 // Usage:
 //   node scripts/ai-ready/cli.mjs [--fail-on error|warning] [--json]
 //        [--config .docs-kit/ai-ready.json] [--skip RULE,RULE] [--retrieval]
-//        [--site BUILD_FOLDER --base-url https://example.com/docs/] PATH...
+//        [--site BUILD_FOLDER --base-url https://example.com/docs/]
+//        [--external https://example.com/other-site/] PATH...
 //
 // PATH is a Markdown file or a folder of them. The check exits with status 1
 // when it finds a problem at the --fail-on level or higher.
@@ -13,6 +14,9 @@
 // scripts/configure.py writes from docs-kit.yml and terms.yml. It's read by
 // default when it exists. --retrieval shows, for each question in a page's
 // front matter, the section a keyword search would retrieve first.
+// --external marks an address under --base-url that belongs to another site,
+// so llms.txt links to it aren't checked against this build. Repeat it for
+// each site.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -22,7 +26,7 @@ import { checkSite, SITE_RULES } from "./site.mjs";
 const RANK = { error: 3, warning: 2, suggestion: 1, info: 0 };
 
 function parseArgs(argv) {
-  const opts = { paths: [], failOn: "error", json: false, site: null, baseUrl: "", config: null, skip: [], retrieval: false };
+  const opts = { paths: [], failOn: "error", json: false, site: null, baseUrl: "", config: null, skip: [], retrieval: false, external: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--fail-on") opts.failOn = argv[++i];
@@ -32,6 +36,7 @@ function parseArgs(argv) {
     else if (a === "--config") opts.config = argv[++i];
     else if (a === "--skip") opts.skip.push(...argv[++i].split(",").map((x) => x.trim()).filter(Boolean));
     else if (a === "--retrieval") opts.retrieval = true;
+    else if (a === "--external") opts.external.push(argv[++i]);
     else if (a === "--help" || a === "-h") opts.help = true;
     else opts.paths.push(a);
   }
@@ -55,7 +60,7 @@ function markdownFiles(p) {
 
 const opts = parseArgs(process.argv.slice(2));
 if (opts.help || (!opts.paths.length && !opts.site)) {
-  console.log(`Usage: node scripts/ai-ready/cli.mjs [--fail-on error|warning] [--json] [--config FILE] [--skip RULE,RULE] [--retrieval] [--site FOLDER --base-url URL] PATH...
+  console.log(`Usage: node scripts/ai-ready/cli.mjs [--fail-on error|warning] [--json] [--config FILE] [--skip RULE,RULE] [--retrieval] [--site FOLDER --base-url URL [--external URL]] PATH...
 
 Page checks: ${PAGE_RULES.map((r) => r.id).join(", ")}
 Site checks: ${SITE_RULES.map((r) => r.id).join(", ")}`);
@@ -89,7 +94,7 @@ for (const file of opts.paths.flatMap(markdownFiles)) {
   results.push({ file, findings: findings.map((f) => ({ ...f, file })), checked, retrieval });
 }
 let site = null;
-if (opts.site) site = checkSite(opts.site, opts.baseUrl);
+if (opts.site) site = checkSite(opts.site, opts.baseUrl, { external: opts.external });
 
 const all = results.flatMap((r) => r.findings).concat(site ? site.findings : []);
 const failing = all.filter((f) => RANK[f.severity] >= RANK[opts.failOn]);
