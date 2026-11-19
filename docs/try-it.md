@@ -4,6 +4,7 @@ description: Send requests to a Relay API sandbox in your browser, with sample d
 doc_type: how_to
 audience: developers who automate network operations
 product_version: v1
+status: published
 last_reviewed: 2026-11-17
 questions:
   - How do I try the Relay API without an account?

@@ -1,6 +1,7 @@
 ---
 title: Devices reference
 description: Devices are the access points and gateways installed at your sites. This reference lists the devices endpoints, their parameters, and their responses.
+status: published
 last_reviewed: '2026-11-17'
 questions:
 - How do I list devices with the Relay API?

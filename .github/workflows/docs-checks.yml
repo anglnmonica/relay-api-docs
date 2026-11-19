@@ -9,6 +9,8 @@
 #   - Accuracy:   Doc Detective walks through the built site like a reader
 #   - AI readiness: the docs-as-code kit's page and site checks, from
 #                 scripts/ai-ready. See the kit's docs/ai-readiness.md.
+#   - Publish readiness: fails if a page is still marked status: draft
+#   - Docs health: the kit's report on every page, attached to the run
 #
 # To change what runs, edit docs-kit.yml, not this file.
 
@@ -73,6 +75,24 @@ jobs:
           node scripts/ai-ready/cli.mjs --fail-on warning
           --site site --base-url https://anglnmonica.github.io/relay-api-docs/
           docs/
+
+  docs-health:
+    name: Publish readiness and docs health
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check that no page is marked draft
+        run: node scripts/health/report.mjs --check-status docs/
+      - name: Build the docs health report
+        run: node scripts/health/report.mjs --title "Relay API docs health" --out docs-health docs/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docs-health
+          path: docs-health/
 
   style:
     name: Style (Vale)
@@ -157,6 +177,12 @@ jobs:
       - name: Build the site
         if: needs.config.outputs.build_command != ''
         run: ${{ needs.config.outputs.build_command }}
+
+      # The published site includes the docs health report, so build it
+      # here too, or the link to it would look broken.
+      - name: Build the docs health report
+        if: needs.config.outputs.build_output != ''
+        run: node scripts/health/report.mjs --out "${{ needs.config.outputs.build_output }}/docs-health" docs/
 
       # A site published under a folder, such as /my-docs/, has full links
       # that start with that folder. Copy the built site into a matching

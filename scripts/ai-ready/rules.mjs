@@ -444,6 +444,11 @@ export function retrieve(markdown, question, top = 3) {
     .slice(0, top);
 }
 
+/** A page's front matter as an object, or null when it has none. */
+export function frontMatter(markdown) {
+  return parseFrontMatter(markdown.replace(/\r\n?/g, "\n").split("\n")).data;
+}
+
 /** The questions listed in a page's front matter. */
 export function pageQuestions(markdown) {
   const fm = parseFrontMatter(markdown.replace(/\r\n?/g, "\n").split("\n"));

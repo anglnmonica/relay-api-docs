@@ -1,6 +1,7 @@
 ---
 title: Sites reference
 description: A site is one physical location on your network, such as a warehouse or campus. Every device belongs to one site. This reference lists the sites endpoints, their parameters, and their responses.
+status: published
 last_reviewed: '2026-11-17'
 questions:
 - How do I list sites with the Relay API?

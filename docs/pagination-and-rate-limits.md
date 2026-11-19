@@ -4,6 +4,7 @@ description: Get every page of a list, and stay within the Relay API's rate limi
 doc_type: api_reference
 audience: developers who automate network operations
 api_version: v1
+status: published
 last_reviewed: 2026-11-17
 questions:
   - How do I get every page of a list?

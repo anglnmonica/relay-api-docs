@@ -1,0 +1,9 @@
+# Who reviews which files. GitHub asks these reviewers on every pull request
+# that changes their files. Later lines win.
+
+# Everything, by default
+* @anglnmonica
+
+# The API spec and the reference generated from it
+/api/ @anglnmonica
+/docs/reference/ @anglnmonica

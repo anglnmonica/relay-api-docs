@@ -1,6 +1,7 @@
 ---
 title: Alerts reference
 description: Alerts report problems on your network, such as a device going offline. This reference lists the alerts endpoints, their parameters, and their responses.
+status: published
 last_reviewed: '2026-11-17'
 questions:
 - How do I list alerts with the Relay API?
