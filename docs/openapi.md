@@ -5,6 +5,8 @@ doc_type: api_reference
 audience: developers who automate network operations
 api_version: v1
 last_reviewed: 2026-11-17
+questions:
+  - Where can I download the Relay OpenAPI specification?
 ---
 
 # OpenAPI specification

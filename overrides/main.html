@@ -1,0 +1,22 @@
+{#- Adds structured data (JSON-LD) to every page, so search engines and AI
+    tools know each page is technical documentation, who wrote it, and when
+    it was last reviewed. -#}
+{% extends "base.html" %}
+
+{% block extrahead %}
+  {{ super() }}
+  {%- if page and page.meta is defined %}
+  {%- set ld = {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": page.meta.title or page.title or config.site_name,
+    "description": page.meta.description or config.site_description,
+    "url": page.canonical_url,
+    "inLanguage": "en",
+    "author": {"@type": "Person", "name": config.site_author, "url": "https://anglnmonica.github.io/"},
+    "isPartOf": {"@type": "WebSite", "name": config.site_name, "url": config.site_url}
+  } -%}
+  {%- if page.meta.last_reviewed %}{% set _ = ld.update({"dateModified": page.meta.last_reviewed | string}) %}{% endif %}
+  <script type="application/ld+json">{{ ld | tojson }}</script>
+  {%- endif %}
+{% endblock %}

@@ -5,6 +5,10 @@ doc_type: api_reference
 audience: developers who automate network operations
 api_version: v1
 last_reviewed: 2026-11-17
+questions:
+  - What can I do with the Relay API?
+  - What is the Relay API base URL?
+  - How does Relay organize sites, devices, and alerts?
 ---
 
 # Relay API overview
@@ -62,3 +66,10 @@ whether a request worked.
 The [OpenAPI specification](openapi.md) describes every operation,
 parameter, and field in a format that code generators and AI assistants
 can read.
+
+These docs also publish:
+
+- [llms.txt](llms.txt), a map of every page for AI tools, with a one-line
+  summary of each.
+- A Markdown copy of each page. Add `index.md` to the page's address, such
+  as `quickstart/index.md`.

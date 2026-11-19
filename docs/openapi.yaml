@@ -2,6 +2,9 @@ openapi: 3.1.0
 info:
   title: Relay API
   version: 1.0.0
+  # The review date on the generated reference pages. Update it when you
+  # review the reference.
+  x-last-reviewed: "2026-11-17"
   summary: Manage the sites, devices, and alerts on a Relay private network.
   description: |
     Relay is a fictional private network platform, created to demonstrate

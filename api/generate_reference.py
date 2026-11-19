@@ -185,9 +185,29 @@ def objects_for_tag(tag):
     return names.get(tag)
 
 
+def front_matter(tag, title):
+    """Title, description, review date, and questions, for search and AI tools.
+
+    The date comes from info.x-last-reviewed in the spec, not today's date,
+    so the --check test gives the same result every day.
+    """
+    summaries = [op["summary"] for item in spec["paths"].values()
+                 for method in METHODS
+                 if (op := item.get(method)) and tag["name"] in op.get("tags", [])]
+    questions = [f"How do I {s[0].lower()}{s[1:]} with the Relay API?" for s in summaries]
+    data = {
+        "title": title,
+        "description": f"{tag['description']} This reference lists the "
+                       f"{tag['name'].lower()} endpoints, their parameters, and their responses.",
+        "last_reviewed": str(spec["info"]["x-last-reviewed"]),
+        "questions": questions,
+    }
+    return "---\n" + yaml.safe_dump(data, sort_keys=False, allow_unicode=True, width=1000) + "---\n\n"
+
+
 def page_for_tag(tag):
     title = f"{tag['name']} reference"
-    out = [HEADER, f"# {title}", "", tag["description"], ""]
+    out = [front_matter(tag, title) + HEADER, f"# {title}", "", tag["description"], ""]
     if "UTC" in json.dumps(spec["paths"]) + json.dumps(spec["components"]):
         out += ["Times are in UTC (Coordinated Universal Time), in the format "
                 "`2026-11-17T18:29:41Z`.", ""]

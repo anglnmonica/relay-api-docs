@@ -1,0 +1,29 @@
+# Relay API docs
+
+> Relay is a fictional private network platform, created by Angelin Monica Selvaraj to demonstrate API documentation. The Relay API lets you manage the sites, devices, and alerts on a Relay private network from your own tools.
+
+Each page has a Markdown copy: add `index.md` to a page's address, such as https://anglnmonica.github.io/relay-api-docs/quickstart/index.md. The OpenAPI specification is at https://anglnmonica.github.io/relay-api-docs/openapi.yaml.
+
+## Get started
+
+- [Relay API overview](https://anglnmonica.github.io/relay-api-docs/): The Relay API lets you manage the sites, devices, and alerts on a Relay private network from your own tools.
+- [Make your first API call](https://anglnmonica.github.io/relay-api-docs/quickstart/): List your Relay sites and the devices at one site, using curl and an API key.
+- [Authentication](https://anglnmonica.github.io/relay-api-docs/authentication/): Create a Relay API key, choose read-only or read-write access, send the key with each request, and replace it if it's exposed.
+- [Try the Relay API](https://anglnmonica.github.io/relay-api-docs/try-it/): Send requests to a Relay API sandbox in your browser, with sample data, and see the responses.
+
+## Guides
+
+- [Reduce interference between access points](https://anglnmonica.github.io/relay-api-docs/guides/reduce-interference/): Find radio interference alerts, lower an access point's transmit power during a maintenance window, and confirm the alert resolves.
+- [Pagination and rate limits](https://anglnmonica.github.io/relay-api-docs/pagination-and-rate-limits/): Get every page of a list, and stay within the Relay API's rate limit of 100 requests per minute.
+- [Errors](https://anglnmonica.github.io/relay-api-docs/errors/): The format of Relay API errors, what each error code means, and which errors are safe to retry.
+
+## Reference
+
+- [Sites reference](https://anglnmonica.github.io/relay-api-docs/reference/sites/): A site is one physical location on your network, such as a warehouse or campus. Every device belongs to one site. This reference lists the sites endpoints, their parameters, and their responses.
+- [Devices reference](https://anglnmonica.github.io/relay-api-docs/reference/devices/): Devices are the access points and gateways installed at your sites. This reference lists the devices endpoints, their parameters, and their responses.
+- [Alerts reference](https://anglnmonica.github.io/relay-api-docs/reference/alerts/): Alerts report problems on your network, such as a device going offline. This reference lists the alerts endpoints, their parameters, and their responses.
+- [OpenAPI specification](https://anglnmonica.github.io/relay-api-docs/openapi/): Download the Relay API's OpenAPI specification, for code generators, API clients, and AI assistants.
+
+## Optional
+
+- [Relay API release notes](https://anglnmonica.github.io/relay-api-docs/release-notes/): Changes to the Relay API, newest first.

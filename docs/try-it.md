@@ -5,6 +5,9 @@ doc_type: how_to
 audience: developers who automate network operations
 product_version: v1
 last_reviewed: 2026-11-17
+questions:
+  - How do I try the Relay API without an account?
+  - Which API keys does the sandbox accept?
 ---
 
 # Try the Relay API

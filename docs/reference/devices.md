@@ -1,3 +1,13 @@
+---
+title: Devices reference
+description: Devices are the access points and gateways installed at your sites. This reference lists the devices endpoints, their parameters, and their responses.
+last_reviewed: '2026-11-17'
+questions:
+- How do I list devices with the Relay API?
+- How do I get a device with the Relay API?
+- How do I update a device with the Relay API?
+---
+
 <!-- Generated from api/openapi.yaml by api/generate_reference.py. Don't edit this page by hand. -->
 
 # Devices reference
