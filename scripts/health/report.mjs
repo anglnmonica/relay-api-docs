@@ -5,19 +5,21 @@
 // Usage:
 //   node scripts/health/report.mjs [--out FOLDER] [--title TEXT]
 //        [--config .docs-kit/health.json] [--today YYYY-MM-DD]
-//        [--check-status] [--json] PATH...
+//        [--check-status] [--json] [--link "LABEL=URL"]... PATH...
 //
 // --out writes index.html and report.json to FOLDER, so you can publish the
 // report with your site. --check-status exits with status 1 when a page is
 // marked status: draft, or has a status the kit doesn't know. Without
-// --out, the report prints as text.
+// --out, the report prints as text. --link adds a link to the bar at the top
+// of the HTML report, such as --link "Back to the docs=https://example.com/docs/".
+// Repeat it for more links.
 
 import fs from "node:fs";
 import path from "node:path";
 import { buildReport, markdownFiles, publishProblems, STATUSES } from "./health.mjs";
 
 function parseArgs(argv) {
-  const opts = { paths: [], out: null, title: "Docs health", config: null, today: null, checkStatus: false, json: false };
+  const opts = { paths: [], out: null, title: "Docs health", config: null, today: null, checkStatus: false, json: false, links: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--out") opts.out = argv[++i];
@@ -26,6 +28,15 @@ function parseArgs(argv) {
     else if (a === "--today") opts.today = argv[++i];
     else if (a === "--check-status") opts.checkStatus = true;
     else if (a === "--json") opts.json = true;
+    else if (a === "--link") {
+      const v = argv[++i] || "";
+      const at = v.indexOf("=");
+      if (at < 1 || !/^https?:\/\//.test(v.slice(at + 1))) {
+        console.error(`--link needs "LABEL=URL", such as "Back to the docs=https://example.com/docs/". Got: ${v}`);
+        process.exit(2);
+      }
+      opts.links.push({ label: v.slice(0, at), url: v.slice(at + 1) });
+    }
     else if (a === "--help" || a === "-h") opts.help = true;
     else opts.paths.push(a);
   }
@@ -34,7 +45,7 @@ function parseArgs(argv) {
 
 const opts = parseArgs(process.argv.slice(2));
 if (opts.help || !opts.paths.length) {
-  console.log("Usage: node scripts/health/report.mjs [--out FOLDER] [--title TEXT] [--config FILE] [--today YYYY-MM-DD] [--check-status] [--json] PATH...");
+  console.log('Usage: node scripts/health/report.mjs [--out FOLDER] [--title TEXT] [--config FILE] [--today YYYY-MM-DD] [--check-status] [--json] [--link "LABEL=URL"]... PATH...');
   process.exit(opts.help ? 0 : 2);
 }
 for (const p of opts.paths) {
@@ -102,7 +113,7 @@ else console.log(lines.join("\n"));
 if (opts.out) {
   fs.mkdirSync(opts.out, { recursive: true });
   fs.writeFileSync(path.join(opts.out, "report.json"), JSON.stringify(report, null, 2) + "\n");
-  fs.writeFileSync(path.join(opts.out, "index.html"), renderHtml(report, opts.title));
+  fs.writeFileSync(path.join(opts.out, "index.html"), renderHtml(report, opts.title, opts.links));
   if (!opts.json) console.log(`\nWrote ${path.join(opts.out, "index.html")} and report.json.`);
 }
 
@@ -137,7 +148,7 @@ function esc(v) {
   return String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 }
 
-function renderHtml(r, title) {
+function renderHtml(r, title, links = []) {
   const s = r.summary;
   const label = { draft: "Draft", "in-review": "In review", published: "Published", "not-set": "Not set" };
   const rank = (p) => (p.review === "due" ? 0 : p.status === "draft" ? 1 : p.ai.errors ? 2 : p.review === "missing" ? 3 : p.status === "in-review" ? 4 : 5);
@@ -222,11 +233,15 @@ tr[hidden] { display: none; }
 .score { font-variant-numeric: tabular-nums; }
 .bar { display: block; height: 4px; width: 100px; max-width: 100%; background: var(--line); border-radius: 2px; margin: 4px 0; }
 .bar span { display: block; height: 100%; background: var(--accent); border-radius: 2px; }
+.topbar { display: flex; flex-wrap: wrap; gap: 6px 20px; padding: 10px max(16px, env(safe-area-inset-left, 0px)); background: var(--panel); border-bottom: 1px solid var(--line); font-size: 14px; }
+.topbar a { color: var(--accent); }
+.topbar a:last-child:not(:first-child) { margin-left: auto; }
 footer { margin-top: 24px; color: var(--muted); font-size: 14px; }
 footer a { color: var(--accent); }
 </style>
 </head>
 <body>
+${links.length ? `<nav class="topbar" aria-label="Related pages">${links.map((l) => `<a href="${esc(l.url)}">${esc(l.label)}</a>`).join("")}</nav>` : ""}
 <main>
 <h1>${esc(title)}</h1>
 <p class="lede">The state of every page on ${esc(r.generated)}: its status, when it was last reviewed, and how many AI-readiness checks it passes. Pages that need attention come first. A review is due after ${r.reviewEveryDays} days.</p>
