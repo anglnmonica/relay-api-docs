@@ -37,7 +37,11 @@ jobs:
           node-version: "22"
       # Publishes the report at /relay-api-docs/docs-health/.
       - name: Build the docs health report
-        run: node scripts/health/report.mjs --title "Relay API docs health" --out site/docs-health docs/
+        run: >-
+          node scripts/health/report.mjs --title "Relay API docs health"
+          --link "Back to Relay API docs=https://anglnmonica.github.io/relay-api-docs/"
+          --link "Back to Projects=https://anglnmonica.github.io/projects/"
+          --out site/docs-health docs/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site

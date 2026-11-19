@@ -20,3 +20,11 @@
   <script type="application/ld+json">{{ ld | tojson }}</script>
   {%- endif %}
 {% endblock %}
+
+{#- A bar above the header on every page, linking back to the portfolio. -#}
+{% block announce %}
+  <div class="portfolio-bar">
+    <span>Relay is a portfolio project by <a href="https://anglnmonica.github.io/">Angelin Monica Selvaraj</a>.</span>
+    <a href="https://anglnmonica.github.io/projects/">Back to Projects</a>
+  </div>
+{% endblock %}
